@@ -1,0 +1,90 @@
+apply plugin: 'base'
+
+group = 'io.lxw.demo'
+description = 'Demo Project (JPA, CDI & Rest)'
+project.ext.buildingDate = new Date()
+
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+	apply plugin: 'project-report'
+	apply plugin: 'findbugs'
+
+	version = demoVersion
+	sourceCompatibility = 1.8
+
+	repositories {
+		mavenCentral()
+		mavenLocal()
+		jcenter()
+	}
+
+	configurations {
+		JPAProvided
+		runtimeProvided
+		systemProvided { extendsFrom JPAProvided, runtimeProvided}
+	}
+
+	dependencies {
+		JPAProvided ("org.eclipse.persistence:org.eclipse.persistence.jpa:$eclipseLnkVersion")
+		//JPAProvided ("org.hibernate:hibernate-entitymanager:$hibernateVersion")
+		runtimeProvided ("org.slf4j:slf4j-jdk14:$slf4jVersion")
+		systemProvided ("javax.servlet:javax.servlet-api:$servletSpecVersion", "javax.transaction:javax.transaction-api:$JTASpecVersion", "org.jboss.weld.servlet:weld-servlet:$weldVersion", "org.slf4j:slf4j-api:$slf4jVersion")
+		testCompile ("junit:junit:$junitVersion", "org.jboss.arquillian.junit:arquillian-junit-container:$arquillianVersion")
+	}
+
+	sourceSets {
+		main {
+			compileClasspath = configurations.compile + configurations.systemProvided
+		}
+		test {
+			compileClasspath = compileClasspath + configurations.systemProvided
+		}
+	}
+
+	ext.commonManifest = manifest {
+		attributes('Implementation-Title': project.name,
+					'Implementation-Version': version,
+					'Implementation-Vendor': 'lxw.io',
+					'Created-By': 'Gradle v' + gradle.gradleVersion,
+					'Build-Jdk': System.properties['java.version'] + '('+System.properties['java.vendor'] + ', ' + System.properties['java.runtime.version'] +')',
+					'Source-Level': sourceCompatibility,
+					'OS-Version': System.properties['os.name'] + ' - ' + System.properties['os.arch'],
+					'Built-By': System.properties['user.name'],
+					'Build-At': parent.ext.buildingDate)
+	}
+
+	jar.manifest = project.ext.commonManifest
+
+	javadoc {
+		source = sourceSets.main.allJava
+		classpath = sourceSets.main.compileClasspath
+		failOnError=false
+	}
+
+	eclipse.classpath {
+		defaultOutputDir = file('classes')
+		plusConfigurations += [configurations.systemProvided]
+		downloadSources = true
+	}
+
+	test.enabled = false
+	tasks.withType(JavaCompile) {options.compilerArgs = ["-g:source,lines,vars"]}
+
+	findbugs {
+		ignoreFailures = true
+		reportLevel = 'high'
+	}
+
+	tasks.withType(FindBugs) {
+		reports {
+			xml.enabled = false
+			html.enabled = true
+		}
+	}
+}
+
+task createWrapper(type: Wrapper) << {
+	println "create gradle wrap with version $gradle.gradleVersion";
+	gradleVersion = gradle.gradleVersion
+}

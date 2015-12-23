@@ -1,0 +1,36 @@
+<persistence version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="demo" transaction-type="RESOURCE_LOCAL">
+		<!-- hibernate provider
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		-->
+		<!-- eclipse provider -->
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+
+		<class>io.lxw.demo.service.domain.Customer</class>
+
+		<properties>
+			<property name="javax.persistence.schema-generation.scripts.action" value="none" />
+			<property name="javax.persistence.schema-generation.scripts.create-target" value="demo.ddl" />
+			<property name="javax.persistence.schema-generation.scripts.drop-target" value="demo-drop.ddl" />
+
+			<!-- Hibernate properties -->
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+
+			<!-- EclipseLink properties -->
+			<property name="eclipselink.logging.level" value="FINE" />
+			<property name="eclipselink.logging.parameters" value="true" />
+			<property name="eclipselink.logging.session" value="true" />
+
+			<property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:file:build/demodb;shutdown=true" />
+			<property name="javax.persistence.jdbc.user" value="sa" />
+			<property name="javax.persistence.jdbc.password" value="" />
+			<property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform" />
+			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+		</properties>
+	</persistence-unit>
+</persistence>
